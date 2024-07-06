@@ -7,21 +7,41 @@ const axios = require("axios");
 async function startServer() {
   const app = express();
   const server = new ApolloServer({
-    typeDefs: `type Todo{
+    typeDefs: `type User{
     id:ID!
-    movie:String
-    image:String
-     imdb_url:String
+    name:String!
+    username:String!
+    email:String!
+    phone:String!
+
+
+
+    }
+    
+    type Todo{
+    id:ID!
+    title:String!
+    completed:Boolean!
+     user:User
     
     }
      
      type Query{
      getTodos:[Todo]
+     getAllUser:[User]
+     getUser(id:ID!):User
      }`,
     resolvers: {
+        Todo:{
+            user:async(todo)=>(await axios.get(`https://jsonplaceholder.typicode.com/users/${todo.userId}`)).data,
+        },
       Query: {
         getTodos: async () =>
-          (await axios.get("https://dummyapi.online/api/movies")).data,
+          (await axios.get("https://jsonplaceholder.typicode.com/todos")).data,
+        getAllUser: async () =>
+          (await axios.get("https://jsonplaceholder.typicode.com/users")).data,
+        getUser:async (parent,{id}) =>
+            (await axios.get(`https://jsonplaceholder.typicode.com/users/${id}`)).data,
       },
     },
   });
