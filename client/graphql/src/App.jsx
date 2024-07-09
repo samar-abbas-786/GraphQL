@@ -1,23 +1,26 @@
 import "./App.css";
-import { ApolloClient, InMemoryCache } from "@apollo/client";
-const client = new ApolloClient({
-  uri: "https://localhost:8000/graphql",
-  cache: new InMemoryCache(),
-});
-const query = `
-query GetTodos{
-getTodos{
-title
-completed
-user{
-name
-email
-phone}
-}
-}`;
+import { useQuery, gql } from "@apollo/client";
+
+const query = gql`
+  query GetAllTodos {
+    getTodos {
+      id
+      title
+      completed
+      user {
+        name
+        email
+      }
+    }
+  }
+`;
 
 function App() {
-  return <></>;
+  const { data, loading, error } = useQuery(query);
+  console.log(data);
+  if (loading) return <h1>Loading....</h1>;
+  if (error) return console.log("Error Occured", error.message);
+  return <div>{JSON.stringify(data)}</div>;
 }
 
 export default App;
